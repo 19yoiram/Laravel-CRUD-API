@@ -1,0 +1,81 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="card mt-5">
+        <div class="card-header"><h4>Product Create</h4></div>
+        <div class="card-body">
+            <a href="{{route('products.index')}}" class="btn btn-info btn-sm mb-3"> <i class="fa fa-arrow-left"> </i> Back</a>
+            <form id="createProductForm">
+             @csrf
+                <div class="mt-2">
+                    <label for="Name">Name:</label>
+                        <input id="name" type="text" name="name" class="form-control" placeholder="Product Name" value="{{old('name')}}"> 
+                        @error("name")
+                        <span class="text-danger">{{$message}}</span>
+                        @enderror   
+                </div>
+
+                <div class="mt-2">
+                    <label for="Image">Image:</label>
+                    <input id="image" type="file" class="form-control" name="image">
+                    @error("image")
+                        <span class="text-danger">{{$message}}</span>
+                        @enderror  
+                </div>
+
+                <div class="mt-2">
+                    <label for="Detail">Detail:</label>
+                    <textarea  id="detail"  name="detail" placeholder="Product Detail" class="form-control"cols="30" rows="5" >{{old('detail')}}</textarea>
+                    @error("detail")
+                        <span class="text-danger">{{$message}}</span>
+                        @enderror  
+                </div>
+
+                <div class="mt-2">
+                    <button id="addButton" class="btn btn-success btn-sm" type="submit" name="submit"> <i class="fa fa-save"></i> Submit</button>
+                </div>
+            </form>
+    </div>
+   </div>
+   <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+   <script>
+$(document).ready(function () {
+    $("#createProductForm").on('submit', function (event) {
+        event.preventDefault();
+        const token = localStorage.getItem('token');
+
+        const name = $("#name").val();
+        const detail = $("#detail").val();
+        const image = $("#image")[0].files[0];
+
+        const formData = new FormData();
+        formData.append('name',name);
+        formData.append('detail',detail);
+        formData.append("image", image);
+
+
+        $.ajax({
+            url: '/api/auth/products',
+            type: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            data: formData,
+            contentType : false,
+            processData : false,
+            success: function (response) {
+               console.log(response);
+               window.location.href = "{{ route('products.index') }}";
+            },
+            error: function (xhr, status, error) {
+                alert('Error: ' + xhr.responseText);
+            }
+        });
+    });
+});
+</script>
+
+@endsection
+
+
